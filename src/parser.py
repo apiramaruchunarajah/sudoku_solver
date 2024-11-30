@@ -3,7 +3,7 @@ from math import sqrt
 
 class Parser:
     def __init__(self, pathname):
-        # Class attributs
+        # Class attributes
         self.N = 0
 
         # Reading the file
@@ -12,17 +12,17 @@ class Parser:
 
         # Removing "\n" from the data (if statement used to remove the last (useless) cell)
         data = [line.replace("\n", "") for line in data if (line != "\n")]
-        print("data : " + str(data))
+        # print("data : " + str(data))
 
         # Length of the data
         data_length = len(data)
-        print("data length : " + str(data_length))
+        # print("data length : " + str(data_length))
 
         # Size N of the Sudoku puzzle
         try:
             NN = int(data[0])
         except ValueError:
-            print("Error: the first line isn't correct")
+            print("Error: the first data_line isn't correct")
             exit()
 
         self.N = sqrt(NN)  # TODO: check that it is a correct integer
@@ -31,39 +31,45 @@ class Parser:
             print("Error the file is not incorrect")
             exit()
 
-        # Removing the first line - corresponding to N - from the data
+        # Removing the first data_line - corresponding to N - from the data
         data.pop(0)
         print("Data : " + str(data))
 
-        # Creating the instances of lines
-        for line in data:  # for each line of data
-            print("Line : " + str(line))
-            new_line = []
-            for char in line:  # for every character of the line
+        # Creating the sudoku matrix
+        self.sudoku_matrix = []
+        for data_line in data:  # for each data_line of data
+            sudoku_line = []
+            for char in data_line:  # for every character of the data_line
                 match char:
                     case _ if '1' <= char <= '9':
-                        new_line.append(char)
+                        sudoku_line.append(char)
                     case _ if 'A' <= char <= 'Z':
-                        new_line.append(char)
+                        sudoku_line.append(char)
                     case '-':
-                        new_line.append('0')
+                        sudoku_line.append('0')
                     case ' ':
-                        pass
+                        pass  # we do nothing if we find a
                     case _:
                         print("File is not correct : expected '1-9', 'A-Z', '-' or ' '")
                         exit()
 
-            # Checking that the length of the line is correct regards to N
-            if len(new_line) != (self.N**2):
-                print("Error a line doesn't contain the correct number of values")
+            # Checking that the length of the data_line is correct regards to N
+            # <=> Checking that we have the correct number of columns for each line
+            if len(sudoku_line) != (self.N ** 2):
+                print("Error a data_line doesn't contain the correct number of values <=> "
+                      "incorrect number of columns")
                 exit()
 
-            print("New line : " + str(new_line))
+            self.sudoku_matrix.append(sudoku_line)
 
+        # Checking that the sudoko matrix has the correct number of lines
+        # print("Sudoku matrix : " + str(self.sudoku_matrix))
+        if len(self.sudoku_matrix) != (self.N ** 2):
+            print("Error: incorrect number of lines")
+            exit()
 
-# for line in data:
-#     line = [char for char in line]
+    def getSudokuMatrix(self):
+        return self.sudoku_matrix
 
-# line1 = [int(char) if (char != '-' and char != ' ') else 0 for char in data[1]]
-
-parser = Parser('./test/sudoku_puzzle_1.txt')
+    def getN(self):
+        return self.N
