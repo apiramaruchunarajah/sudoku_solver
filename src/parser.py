@@ -1,5 +1,6 @@
 from math import sqrt
 
+
 class Parser:
     def __init__(self, pathname):
         # Class attributs
@@ -18,10 +19,15 @@ class Parser:
         print("data length : " + str(data_length))
 
         # Size N of the Sudoku puzzle
-        NN = int(data[0])
+        try:
+            NN = int(data[0])
+        except ValueError:
+            print("Error: the first line isn't correct")
+            exit()
+
         self.N = sqrt(NN)  # TODO: check that it is a correct integer
 
-        if (data_length != (self.N ** 2 + 1)):
+        if data_length != (self.N ** 2 + 1):
             print("Error the file is not incorrect")
             exit()
 
@@ -46,6 +52,11 @@ class Parser:
                     case _:
                         print("File is not correct : expected '1-9', 'A-Z', '-' or ' '")
                         exit()
+
+            # Checking that the length of the line is correct regards to N
+            if len(new_line) != (self.N**2):
+                print("Error a line doesn't contain the correct number of values")
+                exit()
 
             print("New line : " + str(new_line))
 
