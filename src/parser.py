@@ -14,10 +14,6 @@ class Parser:
         data = [line.replace("\n", "") for line in data if (line != "\n")]
         # print("data : " + str(data))
 
-        # Length of the data
-        data_length = len(data)
-        # print("data length : " + str(data_length))
-
         # Size N of the Sudoku puzzle
         try:
             NN = int(data[0])
@@ -27,7 +23,7 @@ class Parser:
 
         self.N = sqrt(NN)  # TODO: check that it is a correct integer
 
-        if data_length != (self.N ** 2 + 1):
+        if len(data) != (self.N ** 2 + 1):
             print("Error the file is not incorrect")
             exit()
 
