@@ -5,6 +5,7 @@ class Parser:
     def __init__(self, pathname):
         # Class attributes
         self.N = 0
+        self.sudoku_matrix = []
 
         # Reading the file
         with open(pathname, 'r', encoding="utf-8") as f:
@@ -32,7 +33,6 @@ class Parser:
         print("Data : " + str(data))
 
         # Creating the sudoku matrix
-        self.sudoku_matrix = []
         for data_line in data:  # for each data_line of data
             sudoku_line = []
             for char in data_line:  # for every character of the data_line
