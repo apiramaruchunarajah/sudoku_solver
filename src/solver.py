@@ -22,17 +22,14 @@ class Solver:
         # => In practice, the maximum value a cell can take is max(N)² = 5² = 25
 
         # Creating a NxNxN² matrix of boolean variables
-        self.boolean_variables_matrix = [[[Bool("x_%s_%s_%s" % (i + 1, j + 1, k + 1))
+        self.boolean_variables_matrix = [[[Bool("x_%s_%s_%s" % (i, j, k + 1))   # i+1 ? j+1 ?
                                            for k in range(int(self.N ** 2))]
                                           for j in range(int(self.N ** 2))]
                                          for i in range(int(self.N ** 2))]
-        print(str(self.boolean_variables_matrix))
-        self.boolean_variables_matrix[0][0][0] = True
-        print(str(self.boolean_variables_matrix[0][0][0]))
 
         # Setting the known variables of the boolean matrix to true
-        for i in range(self.N):
-            for j in range(self.N):
+        for i in range(self.N**2):
+            for j in range(self.N**2):
                 if self.sudoku_matrix[i][j] != '0':  # if the value is known
                     if '1' <= self.sudoku_matrix[i][j] <= '9':  # if the character is in {1-9}
                         k = int(self.sudoku_matrix[i][j]) - 1   # -1 because sudoku number != index
@@ -46,8 +43,7 @@ class Solver:
                         print("Error: not '0' nor belonging to {1-9}U{A-Z}")
                         exit()
 
-        k = ord('A') - ord('A')
-        print("k : " + str(k))
+        print("Known matrix : " + str(self.boolean_variables_matrix))
 
 
 solver = Solver('../test/sudoku_puzzle_1.txt')
