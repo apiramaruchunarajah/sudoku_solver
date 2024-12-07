@@ -40,7 +40,8 @@ class SudokuSolver:
                         self.boolean_variables_matrix[i][j][k] = True
 
                     else:
-                        print("Error: not '0' nor belonging to {1-9}U{A-Z}")  # After parsing we should get such a matrix
+                        print(
+                            "Error: not '0' nor belonging to {1-9}U{A-Z}")  # After parsing we should get such a matrix
                         exit()
 
         print("Known matrix : " + str(self.boolean_variables_matrix))
@@ -58,6 +59,52 @@ class SudokuSolver:
         #print("len constraint_1 : " + str(len(constraint_1)))
         constraint_1 = And(constraint_1)
 
+        # Constraint (C2) : every cell (i,j) has at most one variable Xijk true
+        constraint_2 = []
+        for i in range(self.N ** 2):
+            for j in range(self.N ** 2):
+                constraint_2_cell_ij = []  # constraint : for the cell ij at most one var Xijk is true
+
+                for k in range(self.N ** 2):
+                    constraint_2_cell_ijk = []  # constraint : if Xijk true then Xijk' not true
+
+                    for k_bis in range(self.N ** 2):
+                        if k_bis != k:
+                            constraint_2_cell_ijk.append(Or([Not(self.boolean_variables_matrix[i][j][k]),
+                                                             Not(self.boolean_variables_matrix[i][j][k_bis])]))
+                    constraint_2_cell_ijk = And(constraint_2_cell_ijk)  # And between Ors
+                    # print("Constraint_2_cell_" + str(i) + str(j) + str(k+1) + " : " + str(constraint_2_cell_ijk))
+                    constraint_2_cell_ij.append(constraint_2_cell_ijk)
+
+                constraint_2_cell_ij = And(constraint_2_cell_ij)  # And between Ands
+                print("Constraint_2_cell_" + str(i) + str(j) + " : " + str(constraint_2_cell_ij))
+
+                # constraint_2.append(constraint_2_cell_ij
+
+                """
+                And(
+                    And(
+                            Or(Not(x_3_0_1), Not(x_3_0_2)),
+                                Or(Not(x_3_0_1), Not(x_3_0_3)),
+                                Or(Not(x_3_0_1), Not(True))
+                    ),
+                    And(
+                            Or(Not(x_3_0_2), Not(x_3_0_1)),
+                                Or(Not(x_3_0_2), Not(x_3_0_3)),
+                                Or(Not(x_3_0_2), Not(True))
+                    ),
+                    And(
+                        Or(Not(x_3_0_3), Not(x_3_0_1)),
+                            Or(Not(x_3_0_3), Not(x_3_0_2)),
+                            Or(Not(x_3_0_3), Not(True))
+                    ),
+                    And(
+                        Or(Not(True), Not(x_3_0_1)),
+                            Or(Not(True), Not(x_3_0_2)),
+                            Or(Not(True), Not(x_3_0_3))
+                    )
+                )
+                """
 
         # Solving
         s = Solver()
@@ -70,7 +117,7 @@ class SudokuSolver:
                 for j in range(self.N ** 2):
                     for k in range(self.N ** 2):
                         val = model.eval(self.boolean_variables_matrix[i][j][k])
-                        print("Val " + str(i) + str(j) + str(k+1) + " : " + str(val))
+                        # print("Val " + str(i) + str(j) + str(k + 1) + " : " + str(val))
             print("Len solver model : " + str(len(model)))
         else:
             print("unsat")
