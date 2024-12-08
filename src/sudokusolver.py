@@ -87,7 +87,7 @@ class SudokuSolver:
         constraint_2 = And(constraint_2)
         # print("Constraint 2 : " + str(constraint_2))
 
-        # Constraint (C3) : a digit from {1-N²} appears exactly once in a column
+        # Constraint (C3) : every digit from {1-N²} appears in a column
         constraint_3 = []
         for j in range(self.N ** 2):
             constraint_3_j = []  # constraint : for a column j
@@ -102,12 +102,28 @@ class SudokuSolver:
         constraint_3 = And(constraint_3)
         # print("Constraint_3 : " + str(constraint_3))
 
+        # Constraint (C4) : every digit from {1-N²} appears in a line
+        constraint_4 = []
+        for i in range(self.N ** 2):
+            constraint_4_i = []  # constraint : for a line i
+
+            for k in range(self.N ** 2):
+                constraint_4_i.append(Or([self.boolean_variables_matrix[i][j][k] for j in range(self.N ** 2)]))
+
+            constraint_4_i = And(constraint_4_i)
+            # print("constraint_4_" + str(i) + " : " + str(constraint_4_i))
+            constraint_4.append(constraint_4_i)
+
+        constraint_4 = And(constraint_4)
+        # print("Constraint_4 : " + str(constraint_4))
+
         # Solving
         s = Solver()
         s.add(constraint_0)
         s.add(constraint_1)
         s.add(constraint_2)
         s.add(constraint_3)
+        s.add(constraint_4)
 
         if s.check() == sat:
             model = s.model()
@@ -137,4 +153,4 @@ class SudokuSolver:
             print(solution_matrix[i])
 
 
-sudokuSolver = SudokuSolver('../test/sudoku_puzzle_4x4_2.txt')
+sudokuSolver = SudokuSolver('../test/sudoku_puzzle_2.txt')
