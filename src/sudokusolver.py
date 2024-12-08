@@ -77,52 +77,62 @@ class SudokuSolver:
                     constraint_2_cell_ij.append(constraint_2_cell_ijk)
 
                 constraint_2_cell_ij = And(constraint_2_cell_ij)  # And between Ands
-                print("Constraint_2_cell_" + str(i) + str(j) + " : " + str(constraint_2_cell_ij))
+                # print("Constraint_2_cell_" + str(i) + str(j) + " : " + str(constraint_2_cell_ij))
 
-                # constraint_2.append(constraint_2_cell_ij
+                constraint_2.append(constraint_2_cell_ij)
 
-                """
-                And(
-                    And(
-                            Or(Not(x_3_0_1), Not(x_3_0_2)),
-                                Or(Not(x_3_0_1), Not(x_3_0_3)),
-                                Or(Not(x_3_0_1), Not(True))
-                    ),
-                    And(
-                            Or(Not(x_3_0_2), Not(x_3_0_1)),
-                                Or(Not(x_3_0_2), Not(x_3_0_3)),
-                                Or(Not(x_3_0_2), Not(True))
-                    ),
-                    And(
-                        Or(Not(x_3_0_3), Not(x_3_0_1)),
-                            Or(Not(x_3_0_3), Not(x_3_0_2)),
-                            Or(Not(x_3_0_3), Not(True))
-                    ),
-                    And(
-                        Or(Not(True), Not(x_3_0_1)),
-                            Or(Not(True), Not(x_3_0_2)),
-                            Or(Not(True), Not(x_3_0_3))
-                    )
-                )
-                """
+        constraint_2 = And(constraint_2)
+        # print("Constraint 2 : " + str(constraint_2))
+
+        # Constraint (C3) : a digit from {1-N²} appears exactly once in a column
+        constraint_3 = []
+        for j in range(self.N ** 2):
+            constraint_3_j = []  # constraint : for a column j
+
+            for k in range(self.N ** 2):  # constraint : a value k only appears once in the column j
+                constraint_3_j.append(Or([self.boolean_variables_matrix[i][j][k] for i in range(self.N ** 2)]))
+
+            constraint_3_j = And(constraint_3_j)
+            # print("constraint_3_" + str(j) + " : " + str(constraint_3_j))
+            constraint_3.append(constraint_3_j)
+
+        constraint_3 = And(constraint_3)
+        print("Constraint_3 : " + str(constraint_3))
 
         # Solving
         s = Solver()
         s.add(constraint_1)
+        s.add(constraint_2)
+        s.add(constraint_3)
+
         if s.check() == sat:
             model = s.model()
             # Force evaluation of all cells
-            print("Valuation :")
+            solution_matrix = []
             for i in range(self.N ** 2):
+                solution_matrix_line_i = []
                 for j in range(self.N ** 2):
                     for k in range(self.N ** 2):
                         val = model.eval(self.boolean_variables_matrix[i][j][k])
-                        # print("Val " + str(i) + str(j) + str(k + 1) + " : " + str(val))
+                        already_true = False  # variable to test if only one k is true
+                        if val == True:
+                            if already_true:
+                                print("Error : two Xijk are equal")
+                                exit()
+                            solution_matrix_line_i.append(k+1)
+
+                solution_matrix.append(solution_matrix_line_i)
+            self.print_matrix(solution_matrix)
             print("Len solver model : " + str(len(model)))
         else:
             print("unsat")
 
         # Constraint (C2)
 
+    def print_matrix(self, solution_matrix):
+        print("Solution Matrix : ")
+        for i in range(self.N ** 2):
+            print(solution_matrix[i])
 
-s = SudokuSolver('../test/sudoku_puzzle_1.txt')
+
+s = SudokuSolver('../test/sudoku_puzzle_2.txt')
