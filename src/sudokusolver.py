@@ -28,21 +28,24 @@ class SudokuSolver:
                                          for i in range(int(self.N ** 2))]
 
         # Setting the known variables of the boolean matrix to true
+        # Constraint (C0) : some cells have a known value that can not be changed
+        constraint_0 = []
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
                 if self.sudoku_matrix[i][j] != '0':  # if the value is known
                     if '1' <= self.sudoku_matrix[i][j] <= '9':  # if the character is in {1-9}
                         k = int(self.sudoku_matrix[i][j]) - 1  # -1 because sudoku number != index
-                        self.boolean_variables_matrix[i][j][k] = Bool('True')
+                        constraint_0.append(self.boolean_variables_matrix[i][j][k] == True)
 
                     elif 'A' <= self.sudoku_matrix[i][j] <= 'Z':  # if the character is in {A-Z}
                         k = ord(self.sudoku_matrix[i][j]) - ord('A')  # no need for - 1
-                        self.boolean_variables_matrix[i][j][k] = True
+                        constraint_0.append(self.boolean_variables_matrix[i][j][k] == True)
 
                     else:
                         print(
                             "Error: not '0' nor belonging to {1-9}U{A-Z}")  # After parsing we should get such a matrix
                         exit()
+        print("Constraint 0 : " + str(constraint_0))
 
         print("Known matrix : " + str(self.boolean_variables_matrix))
         print("Known matrix size : " + str(len(self.boolean_variables_matrix)))
@@ -97,10 +100,11 @@ class SudokuSolver:
             constraint_3.append(constraint_3_j)
 
         constraint_3 = And(constraint_3)
-        print("Constraint_3 : " + str(constraint_3))
+        # print("Constraint_3 : " + str(constraint_3))
 
         # Solving
         s = Solver()
+        s.add(constraint_0)
         s.add(constraint_1)
         s.add(constraint_2)
         s.add(constraint_3)
@@ -119,7 +123,7 @@ class SudokuSolver:
                             if already_true:
                                 print("Error : two Xijk are equal")
                                 exit()
-                            solution_matrix_line_i.append(k+1)
+                            solution_matrix_line_i.append(k + 1)
 
                 solution_matrix.append(solution_matrix_line_i)
             self.print_matrix(solution_matrix)
@@ -127,12 +131,10 @@ class SudokuSolver:
         else:
             print("unsat")
 
-        # Constraint (C2)
-
     def print_matrix(self, solution_matrix):
         print("Solution Matrix : ")
         for i in range(self.N ** 2):
             print(solution_matrix[i])
 
 
-s = SudokuSolver('../test/sudoku_puzzle_2.txt')
+sudokuSolver = SudokuSolver('../test/sudoku_puzzle_4x4_2.txt')
