@@ -126,53 +126,88 @@ class SudokuSolver:
         # print("Constraint_4 : " + str(constraint_4))
         return constraint_4
 
+    def getConstraint5ForASquare(self, squareLeftTopCell_i, squareLeftTopCell_j):
+        # Constraint (C5) : every digit from {1-N²} appears in a square
+        constraint_5 = []
+        for k in range(self.N ** 2):
+            constraint_5_k = []
+
+            for i in range(squareLeftTopCell_i, squareLeftTopCell_i + self.N):
+                for j in range(squareLeftTopCell_j, squareLeftTopCell_j + self.N):
+                    constraint_5_k.append(self.boolean_variables_matrix[i][j][k])
+
+            constraint_5_k = Or(constraint_5_k)
+            constraint_5.append(constraint_5_k)
+
+        constraint_5 = And(constraint_5)
+        print("Constraint_5 : " + str(constraint_5))
+
+        return constraint_5
+
     def getConstraint5(self):
         # Constraint (C5) : every digit from {1-N²} appears in a square
         constraint_5 = []
 
-    def solve(self):
-        # Solving
-        s = Solver()
+        i = 0
+        j = 0
+        while i < self.N ** 2:
+            while j < self.N ** 2:
+                constraint_5.append(self.getConstraint5ForASquare(i, j))
+                j += self.N
+                print("ij : " + str(i) + str(j))
 
+            j = 0
+            i += self.N
+            print("i : " + str(i))
+
+        constraint_5 = And(constraint_5)
+        print("Constraint_5 : " + str(constraint_5))
+        return constraint_5
+
+    def solve(self):
         constraint_0 = self.getConstraint0()
         constraint_1 = self.getConstraint1()
         constraint_2 = self.getConstraint2()
         constraint_3 = self.getConstraint3()
         constraint_4 = self.getConstraint4()
+        constraint_5 = self.getConstraint5()
 
+        # Solving
+        s = Solver()
         s.add(constraint_0)
         s.add(constraint_1)
         s.add(constraint_2)
         s.add(constraint_3)
         s.add(constraint_4)
+        s.add(constraint_5)
 
         if s.check() == sat:
             model = s.model()
-            # Force evaluation of all cells
-            solution_matrix = []
-            for i in range(self.N ** 2):
-                solution_matrix_line_i = []
-                for j in range(self.N ** 2):
-                    for k in range(self.N ** 2):
-                        val = model.eval(self.boolean_variables_matrix[i][j][k])
-                        already_true = False  # variable to test if only one k is true
-                        if val == True:
-                            if already_true:
-                                print("Error : two Xijk are equal")
-                                exit()
-                            solution_matrix_line_i.append(k + 1)
-
-                solution_matrix.append(solution_matrix_line_i)
-            self.print_matrix(solution_matrix)
-            print("Len solver model : " + str(len(model)))
+            self.printSolution(model)
         else:
             print("unsat")
 
-    def print_matrix(self, solution_matrix):
+    def printSolution(self, model):
+        # Force evaluation of all cells
+        solution_matrix = []
+        for i in range(self.N ** 2):
+            solution_matrix_line_i = []
+            for j in range(self.N ** 2):
+                for k in range(self.N ** 2):
+                    val = model.eval(self.boolean_variables_matrix[i][j][k])
+                    already_true = False  # variable to test if only one k is true
+                    if val == True:
+                        if already_true:
+                            print("Error : two Xijk are equal")
+                            exit()
+                        solution_matrix_line_i.append(k + 1)
+
+            solution_matrix.append(solution_matrix_line_i)
+        print("Len solver model : " + str(len(model)))
         print("Solution Matrix : ")
         for i in range(self.N ** 2):
             print(solution_matrix[i])
 
 
-sudokuSolver = SudokuSolver('../test/sudoku_puzzle_4x4_2.txt')
+sudokuSolver = SudokuSolver('../test/sudoku_puzzle_2.txt')
 sudokuSolver.solve()
