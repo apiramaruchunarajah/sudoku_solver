@@ -63,9 +63,3 @@ class Parser:
         if len(self.sudoku_matrix) != (self.N ** 2):
             print("Error: incorrect number of lines")
             exit()
-
-    def getSudokuMatrix(self):
-        return self.sudoku_matrix
-
-    def getN(self):
-        return self.N
