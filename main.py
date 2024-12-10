@@ -10,5 +10,5 @@ else:
 
 # Solve the Sudoku
 sudokuSolver = SudokuSolver(pathname)
-print(f"Solving for the sudoku : {pathname} ...")
+print(f"Solving the sudoku {pathname} ...")
 sudokuSolver.solve()
