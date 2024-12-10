@@ -166,7 +166,7 @@ class SudokuSolver:
         if s.check() == sat:
             model = s.model()
             solution_matrix = self.get_solution_matrix(model)
-            self.printMatrix(solution_matrix)
+            self.print_solution(solution_matrix)
         else:
             print("unsat")
 
@@ -205,7 +205,3 @@ class SudokuSolver:
             print("")
             if i % self.N == self.N - 1:
                 print("")
-
-
-sudokuSolver = SudokuSolver('../test/sudoku_puzzle_9x9_2.txt')
-sudokuSolver.solve()
