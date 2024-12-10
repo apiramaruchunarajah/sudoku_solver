@@ -19,13 +19,13 @@ class Parser:
         try:
             NN = int(data[0])
         except ValueError:
-            print("Error: the first data_line isn't correct")
+            print("Parser error: the first data-line isn't correct")
             exit()
 
         self.N = sqrt(NN)  # TODO: check that it is a correct integer
 
         if len(data) != (self.N ** 2 + 1):
-            print("Error the file is not incorrect")
+            print("Parser error : the file is not incorrect")
             exit()
 
         # Removing the first data_line - corresponding to N - from the data
@@ -45,13 +45,13 @@ class Parser:
                     case ' ':
                         pass  # we do nothing if we find a
                     case _:
-                        print("File is not correct : expected '1-9', 'A-Z', '-' or ' '")
+                        print("Parser error : file is not correct, expected '1-9', 'A-Z', '-' or ' '")
                         exit()
 
             # Checking that the length of the data_line is correct regards to N
             # <=> Checking that we have the correct number of columns for each line
             if len(sudoku_line) != (self.N ** 2):
-                print("Error a data_line doesn't contain the correct number of values <=> "
+                print("Parser error : error a data-line doesn't contain the correct number of values <=> "
                       "incorrect number of columns")
                 exit()
 
@@ -60,5 +60,5 @@ class Parser:
         # Checking that the sudoko matrix has the correct number of lines
         # print("Sudoku matrix : " + str(self.sudoku_matrix))
         if len(self.sudoku_matrix) != (self.N ** 2):
-            print("Error: incorrect number of lines")
+            print("Parser error: incorrect number of lines")
             exit()
