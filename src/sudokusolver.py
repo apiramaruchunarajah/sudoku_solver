@@ -9,11 +9,10 @@ class SudokuSolver:
         self.sudoku_matrix = []  # matrix where the cells are characters belonging to a subset of {1-9}U{A-Z}U{0}
         self.boolean_variables_matrix = []  # matrix where the cells are booleans
 
-        # Getting N and the Sudoku matrix
+        # Parsing the input file
         parser = Parser(pathname)
         self.N = int(parser.N)
         self.sudoku_matrix = parser.sudoku_matrix
-        print("Sudoku matrix : " + str(self.sudoku_matrix))
 
         # Each cell can take a value going from 1 to N²
         # This value belongs to a subset of {1-9}U{A-Z}, depending on N
@@ -22,14 +21,13 @@ class SudokuSolver:
         # => In practice, the maximum value a cell can take is max(N)² = 5² = 25 (=> {1-9}U{A-P})
 
         # Creating a N²xN²xN² matrix of boolean variables
-        self.boolean_variables_matrix = [[[Bool("x_%s_%s_%s" % (i, j, k + 1))  # i+1 ? j+1 ?
-                                           for k in range(int(self.N ** 2))]  # change : k+1 => k and range(1, N²) ?
+        self.boolean_variables_matrix = [[[Bool("x_%s_%s_%s" % (i, j, k + 1))
+                                           for k in range(int(self.N ** 2))]
                                           for j in range(int(self.N ** 2))]
                                          for i in range(int(self.N ** 2))]
 
-    def getConstraint0(self):
-        # Setting the known variables of the boolean matrix to true
-        # Constraint (C0) : some cells have a known value that can not be changed
+    # Constraint (C0) : some cells have a known value that can not be changed
+    def get_constraint_0(self):
         constraint_0 = []
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
@@ -46,133 +44,117 @@ class SudokuSolver:
                         print(
                             "Error: not '0' nor belonging to {1-9}U{A-Z}")  # After parsing we should get such a matrix
                         exit()
-        print("Constraint 0 : " + str(constraint_0))
-        print("Known matrix : " + str(self.boolean_variables_matrix))
-        print("Known matrix size : " + str(len(self.boolean_variables_matrix)))
+
         return constraint_0
 
-    def getConstraint1(self):
-        # Constraint (C1) : every cell (i,j) has at least a value Xijk true
+    # Constraint (C1) : every cell (i,j) has at least a variable ijk which is true
+    def get_constraint_1(self):
         constraint_1 = []
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
                 constraint_1.append(Or([self.boolean_variables_matrix[i][j][k]
                                         for k in range(self.N ** 2)]))
-                #print("Constraint 1 : " + str(Or([self.boolean_variables_matrix[i][j][k]
-                #                                  for k in range(self.N ** 2)])))
 
-        #print("len constraint_1 : " + str(len(constraint_1)))
         constraint_1 = And(constraint_1)
         return constraint_1
 
-    def getConstraint2(self):
-        # Constraint (C2) : every cell (i,j) has at most one variable Xijk true
+    # Constraint (C2) : every cell (i,j) has at most one variable ijk which is true
+    def get_constraint_2(self):
         constraint_2 = []
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
-                constraint_2_cell_ij = []  # constraint : for the cell ij at most one var Xijk is true
+                constraint_2_cell_ij = []  # constraint : for the cell ij, at most one variable ijk is true
 
                 for k in range(self.N ** 2):
-                    constraint_2_cell_ijk = []  # constraint : if Xijk true then Xijk' not true
-
-                    for k_bis in range(self.N ** 2):
-                        if k_bis != k:
+                    constraint_2_cell_ijk = []  # constraint : for the cell ij, if ijk is true then ijk' is not true
+                    for k_prime in range(self.N ** 2):
+                        if k_prime != k:
                             constraint_2_cell_ijk.append(Or([Not(self.boolean_variables_matrix[i][j][k]),
-                                                             Not(self.boolean_variables_matrix[i][j][k_bis])]))
+                                                             Not(self.boolean_variables_matrix[i][j][k_prime])]))
+
                     constraint_2_cell_ijk = And(constraint_2_cell_ijk)  # And between Ors
-                    # print("Constraint_2_cell_" + str(i) + str(j) + str(k+1) + " : " + str(constraint_2_cell_ijk))
                     constraint_2_cell_ij.append(constraint_2_cell_ijk)
 
                 constraint_2_cell_ij = And(constraint_2_cell_ij)  # And between Ands
-                # print("Constraint_2_cell_" + str(i) + str(j) + " : " + str(constraint_2_cell_ij))
-
                 constraint_2.append(constraint_2_cell_ij)
 
         constraint_2 = And(constraint_2)
-        # print("Constraint 2 : " + str(constraint_2))
         return constraint_2
 
-    def getConstraint3(self):
-        # Constraint (C3) : every digit from {1-N²} appears in a column
+    # Constraint (C3) : every digit from {1-N²} appears in each column
+    def get_onstraint_3(self):
         constraint_3 = []
         for j in range(self.N ** 2):
-            constraint_3_j = []  # constraint : for a column j
+            constraint_3_j = []  # constraint : for the column j, every digit from {1-N²} appears
 
-            for k in range(self.N ** 2):  # constraint : a value k only appears once in the column j
+            for k in range(self.N ** 2):  # for each value k, there is a line i where k appears
                 constraint_3_j.append(Or([self.boolean_variables_matrix[i][j][k] for i in range(self.N ** 2)]))
 
             constraint_3_j = And(constraint_3_j)
-            # print("constraint_3_" + str(j) + " : " + str(constraint_3_j))
             constraint_3.append(constraint_3_j)
 
         constraint_3 = And(constraint_3)
-        # print("Constraint_3 : " + str(constraint_3))
         return constraint_3
 
-    def getConstraint4(self):
-        # Constraint (C4) : every digit from {1-N²} appears in a line
+    # Constraint (C4) : every digit from {1-N²} appears in each line
+    def get_constraint_4(self):
         constraint_4 = []
         for i in range(self.N ** 2):
-            constraint_4_i = []  # constraint : for a line i
+            constraint_4_i = []  # constraint : for the line i, every digit from {1-N²} appears
 
-            for k in range(self.N ** 2):
+            for k in range(self.N ** 2):  # for each value k, there is a column j where k appears
                 constraint_4_i.append(Or([self.boolean_variables_matrix[i][j][k] for j in range(self.N ** 2)]))
 
             constraint_4_i = And(constraint_4_i)
-            # print("constraint_4_" + str(i) + " : " + str(constraint_4_i))
             constraint_4.append(constraint_4_i)
 
         constraint_4 = And(constraint_4)
-        # print("Constraint_4 : " + str(constraint_4))
         return constraint_4
 
-    def getConstraint5ForASquare(self, squareLeftTopCell_i, squareLeftTopCell_j):
-        # Constraint (C5) : every digit from {1-N²} appears in a square
-        constraint_5 = []
+    # Sub-constraint (C5) : every digit from {1-N²} appears in a given sub-square
+    def get_constraint_5_for_a_sub_square(self, squareLeftTopCell_i, squareLeftTopCell_j):
+        constraint_5_sub_square = []
         for k in range(self.N ** 2):
-            constraint_5_k = []
+            constraint_5_sub_square_k = []  # constraint : the value k appears in the sub-square
 
             for i in range(squareLeftTopCell_i, squareLeftTopCell_i + self.N):
                 for j in range(squareLeftTopCell_j, squareLeftTopCell_j + self.N):
-                    constraint_5_k.append(self.boolean_variables_matrix[i][j][k])
+                    constraint_5_sub_square_k.append(self.boolean_variables_matrix[i][j][k])
 
-            constraint_5_k = Or(constraint_5_k)
-            constraint_5.append(constraint_5_k)
+            constraint_5_sub_square_k = Or(constraint_5_sub_square_k)
+            constraint_5_sub_square.append(constraint_5_sub_square_k)
 
-        constraint_5 = And(constraint_5)
-        print("Constraint_5 : " + str(constraint_5))
+        constraint_5_sub_square = And(constraint_5_sub_square)
+        return constraint_5_sub_square
 
-        return constraint_5
-
-    def getConstraint5(self):
-        # Constraint (C5) : every digit from {1-N²} appears in a square
+    # Constraint (C5) : every digit from {1-N²} appears in each sub-square
+    def get_constraint_5(self):
         constraint_5 = []
 
         i = 0
         j = 0
         while i < self.N ** 2:
             while j < self.N ** 2:
-                constraint_5.append(self.getConstraint5ForASquare(i, j))
+                constraint_5.append(self.get_constraint_5_for_a_sub_square(i, j))
                 j += self.N
-                print("ij : " + str(i) + str(j))
 
             j = 0
             i += self.N
-            print("i : " + str(i))
 
         constraint_5 = And(constraint_5)
-        print("Constraint_5 : " + str(constraint_5))
         return constraint_5
 
+    # Solves the sudoku and prints its solution if any
     def solve(self):
-        constraint_0 = self.getConstraint0()
-        constraint_1 = self.getConstraint1()
-        constraint_2 = self.getConstraint2()
-        constraint_3 = self.getConstraint3()
-        constraint_4 = self.getConstraint4()
-        constraint_5 = self.getConstraint5()
+        # Constraints C0 to C5
+        constraint_0 = self.get_constraint_0()
+        constraint_1 = self.get_constraint_1()
+        constraint_2 = self.get_constraint_2()
+        constraint_3 = self.get_onstraint_3()
+        constraint_4 = self.get_constraint_4()
+        constraint_5 = self.get_constraint_5()
 
-        # Solving
+        # Z3 solver
         s = Solver()
         s.add(constraint_0)
         s.add(constraint_1)
@@ -183,31 +165,47 @@ class SudokuSolver:
 
         if s.check() == sat:
             model = s.model()
-            self.printSolution(model)
+            solution_matrix = self.get_solution_matrix(model)
+            self.printMatrix(solution_matrix)
         else:
             print("unsat")
 
-    def printSolution(self, model):
-        # Force evaluation of all cells
+    # Returns the solution matrix
+    def get_solution_matrix(self, model):
+        # Evaluation of all cells
         solution_matrix = []
+
         for i in range(self.N ** 2):
-            solution_matrix_line_i = []
+            solution_matrix_line_i = []  # line i of the solution matrix
             for j in range(self.N ** 2):
+
+                already_true = False  # variable to test if only one k is true for the cell ij
                 for k in range(self.N ** 2):
                     val = model.eval(self.boolean_variables_matrix[i][j][k])
-                    already_true = False  # variable to test if only one k is true
                     if val == True:
                         if already_true:
-                            print("Error : two Xijk are equal")
+                            print("Error : the model gives two values for k for one cell ij")
                             exit()
-                        solution_matrix_line_i.append(k + 1)
+                        else:
+                            solution_matrix_line_i.append(k + 1)
+                            already_true = True
 
             solution_matrix.append(solution_matrix_line_i)
-        print("Len solver model : " + str(len(model)))
-        print("Solution Matrix : ")
+        return solution_matrix
+
+    # Prints the solution matrix
+    def print_solution(self, solution_matrix):
+        print("Solution : ")
+        print(self.N ** 2)
         for i in range(self.N ** 2):
-            print(solution_matrix[i])
+            for j in range(self.N ** 2):
+                print(solution_matrix[i][j], end='')
+                if j % self.N == self.N - 1:
+                    print(" ", end='')
+            print("")
+            if i % self.N == self.N - 1:
+                print("")
 
 
-sudokuSolver = SudokuSolver('../test/sudoku_puzzle_2.txt')
+sudokuSolver = SudokuSolver('../test/sudoku_puzzle_9x9_2.txt')
 sudokuSolver.solve()
