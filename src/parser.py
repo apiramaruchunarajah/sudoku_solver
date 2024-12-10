@@ -30,7 +30,6 @@ class Parser:
 
         # Removing the first data_line - corresponding to N - from the data
         data.pop(0)
-        print("Data : " + str(data))
 
         # Creating the sudoku matrix
         for data_line in data:  # for each data_line of data
