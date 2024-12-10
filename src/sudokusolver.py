@@ -1,4 +1,4 @@
-from parser import Parser
+from src.parser import Parser
 from z3 import *
 
 
@@ -166,7 +166,9 @@ class SudokuSolver:
         if s.check() == sat:
             model = s.model()
             solution_matrix = self.get_solution_matrix(model)
-            self.print_solution(solution_matrix)
+
+            print("sat, solution : ")
+            self.print_sudoku(solution_matrix)
         else:
             print("unsat")
 
@@ -194,12 +196,11 @@ class SudokuSolver:
         return solution_matrix
 
     # Prints the solution matrix
-    def print_solution(self, solution_matrix):
-        print("Solution : ")
+    def print_sudoku(self, sudoku_matrix):
         print(self.N ** 2)
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
-                print(solution_matrix[i][j], end='')
+                print(sudoku_matrix[i][j], end='')
                 if j % self.N == self.N - 1:
                     print(" ", end='')
             print("")
