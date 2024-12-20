@@ -37,7 +37,7 @@ class SudokuSolver:
                         constraint_0.append(self.boolean_variables_matrix[i][j][k] == True)
 
                     elif 'A' <= self.sudoku_matrix[i][j] <= 'Z':  # if the character is in {A-Z}
-                        k = ord(self.sudoku_matrix[i][j]) - ord('A')  # no need for - 1
+                        k = ord(self.sudoku_matrix[i][j]) - ord('A') + 9  # 9 because the index of 'A' should be 9
                         constraint_0.append(self.boolean_variables_matrix[i][j][k] == True)
 
                     else:
@@ -82,7 +82,7 @@ class SudokuSolver:
         return constraint_2
 
     # Constraint (C3) : every digit from {1-N²} appears in each column
-    def get_onstraint_3(self):
+    def get_constraint_3(self):
         constraint_3 = []
         for j in range(self.N ** 2):
             constraint_3_j = []  # constraint : for the column j, every digit from {1-N²} appears
@@ -150,7 +150,7 @@ class SudokuSolver:
         constraint_0 = self.get_constraint_0()
         constraint_1 = self.get_constraint_1()
         constraint_2 = self.get_constraint_2()
-        constraint_3 = self.get_onstraint_3()
+        constraint_3 = self.get_constraint_3()
         constraint_4 = self.get_constraint_4()
         constraint_5 = self.get_constraint_5()
 
@@ -200,7 +200,12 @@ class SudokuSolver:
         print(self.N ** 2)
         for i in range(self.N ** 2):
             for j in range(self.N ** 2):
-                print(sudoku_matrix[i][j], end='')
+                if sudoku_matrix[i][j] < 10:
+                    print(sudoku_matrix[i][j], end='')
+                else:
+                    letter = chr(sudoku_matrix[i][j] - 10 + ord('A'))  # conversion from number to letter if needed
+                    print(letter, end='')
+
                 if j % self.N == self.N - 1:
                     print(" ", end='')
             print("")
