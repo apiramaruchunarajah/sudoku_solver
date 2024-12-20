@@ -28,9 +28,27 @@ It is to be noted that the puzzle **sudoku_16x16_2_difficult** takes a lot of ti
 computer).
 
 ### Test example
+#### Command line
    ```bash
     python3 main.py puzzles/sudoku_9x9_1
    ```
 
+#### Expected response
+   ```bash
+    Solving the sudoku puzzles/sudoku_9x9_1 ...
+    sat, solution : 
+    9
+    754 139 628 
+    829 465 713 
+    361 287 945 
+    
+    632 874 591 
+    948 521 367 
+    175 396 284 
+    
+    287 943 156 
+    416 752 839 
+    593 618 472 
+   ```
 
 ---
