@@ -3,60 +3,17 @@
 In this document we describe how the Sudoku solver was implemented.
 
 ## 1. Sudoku puzzle representation
-### 1.1 
-```
-$$
-a \cdot b
-$$
-```
+### 1.1 Possible values for each cell
+$N^{2}$ corresponds to the length of the Sudoku.  
+Each cell of the Sudoku can take a value between $1$ to $N^{2}$. This value is represented by an element from $\{1 \ldots 9\}\cup
+\{A \ldots Z\}$.  
+The maximum value $N_{max}$ that $N$ can take verifies $N_{max}^{2} = Z \Leftrightarrow N_{max}^{2} = 35$. This means that
+we have $N_{max} < 6 \Rightarrow N_{max} = 5$.   
+Therefore, in practice, the maximum value that a cell can take is $N_{max}^{2} = 5^{2} = 25$. So, in practice, the possible value that a cell can take is represented 
+by an element of $\{1 \ldots 9\}\cup\{A \ldots P\}$.
+
+### 1.2 Reduction to a SAT problem
 
 
-### Setup Instructions
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/apiramaruchunarajah/sudoku_solver.git
-   cd sudoku_solver
-   ```
-
-2. Execute the solver:
-
-   ```bash
-   python3 main.py path_to_puzzle
-   ```
-
----
-## 🧪 Testing the solver
-### Provided Sudoku puzzles
-You can find in the folder `/puzzles/` some Sudoku puzzles that you can use to test the solver. The puzzles are of 
-different size and difficulty.  
-
-It is to be noted that the puzzle **sudoku_16x16_2_difficult** takes a lot of time to be solved (~15min on my 
-computer).
-
-### Test example
-#### Command line
-   ```bash
-    python3 main.py puzzles/sudoku_9x9_1
-   ```
-
-#### Expected response
-   ```bash
-    Solving the sudoku puzzles/sudoku_9x9_1 ...
-    sat, solution : 
-    9
-    754 139 628 
-    829 465 713 
-    361 287 945 
-    
-    632 874 591 
-    948 521 367 
-    175 396 284 
-    
-    287 943 156 
-    416 752 839 
-    593 618 472 
-   ```
-
----
+## 2. Constraints
+To solve the Sudoku puzzle, we have the following 6 constraints.
