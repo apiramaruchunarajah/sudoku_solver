@@ -1,7 +1,15 @@
 
-# User manual
+# Specification
+In this document we describe how the Sudoku solver was implemented.
 
-## 🚀 Solving a Sudoku puzzle
+## 1. Sudoku puzzle representation
+### 1.1 
+```
+$$
+a \cdot b
+$$
+```
+
 
 ### Setup Instructions
 
