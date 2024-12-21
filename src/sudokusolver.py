@@ -14,12 +14,6 @@ class SudokuSolver:
         self.N = int(parser.N)
         self.sudoku_matrix = parser.sudoku_matrix
 
-        # Each cell can take a value going from 1 to N²
-        # This value belongs to a subset of {1-9}U{A-Z}, depending on N
-        # The maximum value of N verifies max(N)² = Z <=> max(N)² = 35
-        # => max(N) < 6 => max(N) = 5
-        # => In practice, the maximum value a cell can take is max(N)² = 5² = 25 (=> {1-9}U{A-P})
-
         # Creating a N²xN²xN² matrix of boolean variables
         self.boolean_variables_matrix = [[[Bool("x_%s_%s_%s" % (i, j, k + 1))
                                            for k in range(int(self.N ** 2))]
